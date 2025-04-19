@@ -25,24 +25,47 @@
  * For more information, please refer to <https://unlicense.org/>
  */
 
+#include <stdint.h>
+#include <unistd.h>
+
+/*
+ * This program gets a time stamp in unix epoch format as an argument or
+ * read it from standard input, then translates it to ISO 8601, outputing
+ * to stardard output.
+ */
+
 int
 main(int argc, char *argv[])
 {
 	int i, c;
 
-	long long time;
+	int64_t time; /* As of 2025, Unix time is 64 bits in most systems */
 
-	if (argc < 2) {
-		return 1;
-	}
+	ssize_t ret;
+
+	char *str;
+
+	char buf[22]; /* To fit a 64 bit int as digits, '\n' and '\0' */
 
 	/*
 	 * This program assumes ASCII
 	 */
 
-	for (time = i = 0; argv[1][i] != '\0'; ++i) {
-		if ((c = argv[1][i] - '0') < 0 || c > 9)
+	if (argc < 2) {
+		if ((ret = read(0, buf, sizeof(char) * 22)) <= 0) {
 			return 1;
+		}
+		for (i = 0; buf[i] != '\n' && i < 21; ++i);
+		buf[21] = buf[i] = '\0';
+		str = &buf[0];
+	} else {
+		str = argv[1];
+	}
+
+	for (time = i = 0; str[i] != '\0'; ++i) {
+		if ((c = str[i] - '0') < 0 || c > 9) {
+			return 1;
+		}
 		time = time * 10 + c;
 	}
 
