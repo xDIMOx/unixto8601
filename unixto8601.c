@@ -35,9 +35,17 @@
  */
 
 int
+is_leap(int year)
+{
+	return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
+}
+
+int
 main(int argc, char *argv[])
 {
 	int i, c;
+	int total_days, rem_secs;
+	int year, leap;
 
 	int64_t time; /* As of 2025, Unix time is 64 bits in most systems */
 
@@ -67,6 +75,13 @@ main(int argc, char *argv[])
 			return 1;
 		}
 		time = time * 10 + c;
+	}
+
+	total_days = time / (60 * 60 * 24);
+	rem_secs = time % (60 * 60 * 24);
+
+	for (year = 1970; total_days >= ((leap = is_leap(year)) ? 366 : 365); ++year) {
+		total_days -= leap ? 366 : 365;
 	}
 
 	return 0;
