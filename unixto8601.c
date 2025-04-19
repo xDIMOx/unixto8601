@@ -28,6 +28,10 @@
 #include <stdint.h>
 #include <unistd.h>
 
+enum Month {
+	JAN = 1, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC
+};
+
 /*
  * This program gets a time stamp in unix epoch format as an argument or
  * read it from standard input, then translates it to ISO 8601, outputing
@@ -40,12 +44,39 @@ is_leap(int year)
 	return year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
 }
 
+/* days in month */
+int
+dim(int mon, int leap)
+{
+	if (leap && mon == FEB) {
+		return 29;
+	}
+
+	switch (mon) {
+	case JAN: return 31;
+	case FEB: return 28;
+	case MAR: return 31;
+	case APR: return 30;
+	case MAY: return 31;
+	case JUN: return 30;
+	case JUL: return 31;
+	case AUG: return 31;
+	case SEP: return 30;
+	case OCT: return 31;
+	case NOV: return 30;
+	case DEC: return 31;
+	}
+
+	return 0;
+}
+
 int
 main(int argc, char *argv[])
 {
 	int i, c;
 	int total_days, rem_secs;
 	int year, leap;
+	int mon, nd;
 
 	int64_t time; /* As of 2025, Unix time is 64 bits in most systems */
 
@@ -82,6 +113,10 @@ main(int argc, char *argv[])
 
 	for (year = 1970; total_days >= ((leap = is_leap(year)) ? 366 : 365); ++year) {
 		total_days -= leap ? 366 : 365;
+	}
+
+	for (mon = JAN; total_days >= (nd = dim(mon, leap)); ++mon) {
+		total_days -= nd;
 	}
 
 	return 0;
