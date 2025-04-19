@@ -25,8 +25,11 @@
  * For more information, please refer to <https://unlicense.org/>
  */
 
+#include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
+
+#define BUF_SZ 27 /* To fit the input and output */
 
 enum Month {
 	JAN = 1, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC
@@ -34,7 +37,7 @@ enum Month {
 
 /*
  * This program gets a time stamp in unix epoch format as an argument or
- * read it from standard input, then translates it to ISO 8601, outputing
+ * read it from standard input, then translates it to ISO 8601 (UTC), outputing
  * to stardard output.
  */
 
@@ -85,18 +88,18 @@ main(int argc, char *argv[])
 
 	char *str;
 
-	char buf[22]; /* To fit a 64 bit int as digits, '\n' and '\0' */
+	char buf[BUF_SZ];
 
 	/*
 	 * This program assumes ASCII
 	 */
 
 	if (argc < 2) {
-		if ((ret = read(0, buf, sizeof(char) * 22)) <= 0) {
+		if ((ret = read(0, buf, sizeof(char) * BUF_SZ)) <= 0) {
 			return 1;
 		}
-		for (i = 0; buf[i] != '\n' && i < 21; ++i);
-		buf[21] = buf[i] = '\0';
+		for (i = 0; buf[i] != '\n' && i < BUF_SZ; ++i);
+		buf[BUF_SZ - 1] = buf[i] = '\0';
 		str = &buf[0];
 	} else {
 		str = argv[1];
@@ -130,6 +133,8 @@ main(int argc, char *argv[])
 
 	min = rem_secs / 60;
 	rem_secs = rem_secs % 60;
+
+	printf("%d-%02d-%02dT%02d:%02d:%02dZ\n", year, mon, day, hour, min, rem_secs);
 
 	return 0;
 }
