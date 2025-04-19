@@ -28,5 +28,23 @@
 int
 main(int argc, char *argv[])
 {
-	return 0
+	int i, c;
+
+	long long time;
+
+	if (argc < 2) {
+		return 1;
+	}
+
+	/*
+	 * This program assumes ASCII
+	 */
+
+	for (time = i = 0; argv[1][i] != '\0'; ++i) {
+		if ((c = argv[1][i] - '0') < 0 || c > 9)
+			return 1;
+		time = time * 10 + c;
+	}
+
+	return 0;
 }
