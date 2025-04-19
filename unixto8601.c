@@ -76,7 +76,8 @@ main(int argc, char *argv[])
 	int i, c;
 	int total_days, rem_secs;
 	int year, leap;
-	int mon, nd;
+	int mon, nd, day;
+	int hour, min;
 
 	int64_t time; /* As of 2025, Unix time is 64 bits in most systems */
 
@@ -118,6 +119,17 @@ main(int argc, char *argv[])
 	for (mon = JAN; total_days >= (nd = dim(mon, leap)); ++mon) {
 		total_days -= nd;
 	}
+
+	day = total_days;
+	if (rem_secs > 0) {
+		++day;
+	}
+
+	hour = rem_secs / (60 * 60);
+	rem_secs = rem_secs % (60 * 60);
+
+	min = rem_secs / 60;
+	rem_secs = rem_secs % 60;
 
 	return 0;
 }
